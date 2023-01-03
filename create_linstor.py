@@ -15,6 +15,19 @@ class CreateLinstor(object):
 
         return drbd_result, server_result, client_result
 
+    def create_controller(self, ssh_conn, controllers, hostname, host_ip):
+        self.linstor_cmd.start_controller(ssh_conn)
+        self.linstor_cmd.start_satellite(ssh_conn)
+        self.linstor_cmd.vim_conf(controllers, ssh_conn)
+        self.linstor_cmd.create_node(hostname, host_ip, ssh_conn)
+
+    def create_satellite(self, ssh_conn, controllers, hostname, host_ip):
+        self.linstor_cmd.start_satellite(ssh_conn)
+        self.linstor_cmd.vim_conf(controllers, ssh_conn)
+        self.linstor_cmd.create_node(hostname, host_ip, ssh_conn)
+
+
+
 
 
 
