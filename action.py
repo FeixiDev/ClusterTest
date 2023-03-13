@@ -30,14 +30,14 @@ class Linstor(object):
         return result
 
     # node创建
-    def create_node(self, node_name, ip, node_type, ssh_conn=None):
-        cmd = f'linstor n create {node_name} {ip} --node-type {node_type}'
+    def create_node(self, node_name, ip, ssh_conn=None):
+        cmd = f'linstor n create {node_name} {ip} --node-type combined'
         result = utils.exec_cmd(cmd, ssh_conn)
         return result
 
     # sotrage pool创建
-    def create_sp(self, node_name, sp_type, sp_name, vg_name, ssh_conn=None):
-        cmd = f'linstor sp create {sp_type} {node_name} {sp_name} {vg_name}'
+    def create_sp(self, node_name, pool_name, vg_name, ssh_conn=None):
+        cmd = f'linstor sp create lvm {node_name} {pool_name} {vg_name}'
         result = utils.exec_cmd(cmd, ssh_conn)
         return result
 
@@ -205,20 +205,23 @@ class Linstor(object):
         result = utils.exec_cmd(cmd, ssh_conn)
         return result
 
+    def vim_conf(self, ip, ssh_conn=None):
+        data = f"[global]\ncontrollers={ip}"
+        cmd = f'echo "{data}" > /etc/linstor/linstor-client.conf'
+        result = utils.exec_cmd(cmd, ssh_conn)
+        return result
+
 
 class LVM(object):
     # pv创建
-    def create_pv(self, path, ssh_conn=None):
-        cmd = f'pvcreate {path}'
+    def create_pv(self, device, ssh_conn=None):
+        cmd = f'pvcreate /dev/{device}'
         result = utils.exec_cmd(cmd, ssh_conn)
         return result
 
     # vg创建(传入多个vg名的数组)
-    def create_vg(self, pv_name_list, vg_name, ssh_conn=None):
-        pv = ''
-        for i in pv_name_list:
-            pv += i + ''
-        cmd = f'vgcreate {vg_name} {pv}'
+    def create_vg(self, device, vg_name, ssh_conn=None):
+        cmd = f'vgcreate {vg_name} /dev/{device}'
         result = utils.exec_cmd(cmd, ssh_conn)
         return result
 
